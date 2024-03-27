@@ -9,3 +9,4 @@ mycheck printChecks.
 mycheck checksOver: 1 do: [:x | x printNl].
 mycheck checksOver: 17 do: [:x | x printNl]. 
 mycheck checksOver: 200 do: [:x | x printNl].
+mycheck writeCheck: 100.
