@@ -7,10 +7,10 @@ Employee subclass: HourlyEmployee [
     ]
 
     printInfo [
-        super printInfo.
-        Transcript show: 'Hours: ', (self hours asString); cr. "Convert salary to string before output"
-        Transcript show: 'Rate: ', (self rate asString); cr. "Convert salary to string before output"
-        Transcript show: 'Salary: ', (self salary asString); cr. "Convert salary to string before output"
+        Transcript show: 'Hourly employee: ', self fullName; cr.
+        Transcript show: 'Hours worked: ', (self hours asString), ', hourly rate: ', (self rate asString); cr. "Convert salary to string before output"
+        Transcript show: 'Earned: $', (self salary asString); cr. "Convert salary to string before output"
+        Transcript cr.
     ]
     
     salary [

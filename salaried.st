@@ -12,8 +12,10 @@ Employee subclass: SalariedEmployee [
     ]
 
     printInfo [
-        super printInfo.
-        Transcript show: 'Salary: ', (self salary asString); cr. "Convert salary to string before output"
+        Transcript show: 'Salaried employee: ', self fullName; cr.
+        Transcript show: 'weekly salary: ', (self salary asString); cr. "Convert salary to string before output"
+        Transcript show: 'earned: $', self salary asString; cr.
+        Transcript cr.
     ]
     
     salary [

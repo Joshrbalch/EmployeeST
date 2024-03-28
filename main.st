@@ -11,7 +11,7 @@ employeesFile := CmdLine args at: 4.
 employeeList := OrderedCollection new.
 
 "Open and read employees file"
-(FileStream fileNamed: fileName) ifNotNil: [:file |
+(FileStream fileNamed: employeesFile) ifNotNil: [:file |
     fileLines := file lines.
     file close.
 ] ifNil: [
@@ -37,15 +37,15 @@ fileLines do: [:line |
             employeeList add: (SalariedEmployee new: firstName lastName salary)
         ].
         ['hourly'] -> [
-            | hoursRate |
+            | hoursRate hoursWorked|
             hoursRate := otherAttributes collect: [:each | each asNumber]. "Assuming hours and rate are the next two attributes after the name"
-            employeeList add: (HourlyEmployee new: firstName lastName hoursRate first hoursRate second)
+            employeeList add: (HourlyEmployee new: firstName lastName hoursWorked hoursRate)
         ].
         ['commission'] -> [
-            | sales baseCommissionRate |
+            | sales baseCommissionRate basePay|
             sales := otherAttributes first asNumber.
             baseCommissionRate := otherAttributes second asNumber.
-            employeeList add: (CommissionEmployee new: firstName lastName sales baseCommissionRate)
+            employeeList add: (CommissionEmployee new: firstName lastName basePay sales baseCommissionRate)
         ].
     } otherwise: [
         Transcript show: 'Unknown employee type: ', employeeType; cr.

@@ -8,12 +8,10 @@ Employee subclass: CommissionEmployee [
     ]
 
     printInfo [
-        Transcript
-            nextPutAll: 'Commission employee: ', self fullName;
-            nextPutAll: 'minimum salary: ', (self baseSalary asString);
-            nextPutAll: 'sales amount: ', (self sales asString); cr;
-            nextPutAll: 'commission rate: ', ((self rate * 100) asString), '%';
-            nextPutAll: 'earned $', (self salaryCalc asString);.
+        Transcript show: 'Commission employee: ', self fullName; cr.
+        Transcript show: 'minimum salary: ', baseSalary printString, ', sales amount: ', self sales asString, ', commission rate: ', (self rate * 100) asString, '%'; cr.
+        Transcript show: 'earned $', self salaryCalc printString; cr.
+        Transcript cr.
     ]
 
 
