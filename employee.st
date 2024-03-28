@@ -1,15 +1,28 @@
 Object subclass: Employee [
-    | name |
-    Employee class >> new [
-        ^super new initialize
+    | firstName lastName |
+    
+    Employee class >> new: aFirst lastName: aLast [
+        ^self new setFirstName: aFirst; setLastName: aLast; yourself
     ]
-    Employee >> initialize [
-        name := 'John Doe'
+    
+    setFirstName: aFirst [
+        firstName := aFirst
     ]
-    Employee >> name [
-        ^name
+    
+    setLastName: aLast [
+        lastName := aLast
     ]
-    Employee >> name: aString [
-        name := aString
+
+    printInfo [
+        Transcript show: 'First Name: ', firstName; cr.
+        Transcript show: 'Last Name: ', lastName; cr.
+    ]
+    
+    firstName [
+        ^firstName
+    ]
+    
+    lastName [
+        ^lastName
     ]
 ]
