@@ -17,6 +17,10 @@ Object subclass: Employee [
         Transcript show: 'First Name: ', firstName; cr.
         Transcript show: 'Last Name: ', lastName; cr.
     ]
+
+    fullName [
+        ^firstName, ' ', lastName
+    ]
     
     firstName [
         ^firstName
