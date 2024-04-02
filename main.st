@@ -1,3 +1,55 @@
+Object subclass: checkThresh [
+    | value operation threshold |
+
+    setValue: val [
+        value := val.
+    ]
+
+    setOperation: op [
+        operation := op.
+    ]
+
+    setThreshold: thresh [
+        threshold := thresh.
+    ]
+
+    compareOps [
+        | result |
+        " Transcript show: 'Threshold: ', threshold printString; cr. "
+
+        result := true.
+
+        operation = 'eq' ifTrue: [
+            " Transcript show: 'Value: ', value printString; cr. "
+            result := ((value asNumber) = (threshold asNumber)).
+        ] ifFalse: [
+            operation = 'ne' ifTrue: [
+                result := ((value asNumber) ~= (threshold asNumber)).
+            ] ifFalse: [
+                operation = 'gt' ifTrue: [
+                    result := ((value asNumber) > (threshold asNumber)).
+                ] ifFalse: [
+                    operation = 'lt' ifTrue: [
+                        result := ((value asNumber) < (threshold asNumber)).
+                    ] ifFalse: [
+                        operation = 'ge' ifTrue: [
+                            result := ((value asNumber) >= (threshold asNumber)).
+                        ] ifFalse: [
+                            operation = 'le' ifTrue: [
+                                result := ((value asNumber) <= (threshold asNumber)).
+                            ].
+                        ].
+                    ].
+                ].
+            ].
+        ].
+
+        " Transcript show: 'Result: ', result printString; cr. "
+
+        ^ result.
+    ]
+].
+
 "Check for correct number of arguments"
 Smalltalk arguments size >= 2 ifFalse: [
     Transcript show: 'Usage: gst main.st salaried.st hourly.st commission.st -f employees.dat count'; cr.
@@ -79,13 +131,22 @@ file ifNotNil: [
 
 check := 0.
 
+gate := checkThresh new.
+gate setOperation: mod.
+gate setThreshold: threshold.
+
 "Perform actions based on command-line arguments"
 operation = 'count' ifTrue: [
-    Transcript show: 'Total employees: ', employeeList size asString; cr.
+    Transcript show: 'Total employees: ', employeeList size asString; cr. 
     check := 1.
 ].
 operation = 'print' ifTrue: [
-    employeeList do: [:employee | Transcript show: employee printInfo printString; cr].
+    employeeList do: [:employee | 
+        gate setValue: (employee getSalary) asNumber.
+        gate compareOps ifTrue: [
+            employee printInfo printString.
+        ].
+    ].
     check := 1.
 ].
 
@@ -93,17 +154,27 @@ operation = 'min' ifTrue: [
     emp := Employee new.
     emp := employeeList first.
 
-    employeeList do: [:employee | (emp getSalary) > (employee getSalary) ifTrue: [emp := employee]].
-
+    employeeList do: [:employee |
+        gate setValue: (employee getSalary) asNumber.
+        gate compareOps ifTrue: [
+            (emp getSalary) > (employee getSalary) ifTrue: [emp := employee].
+        ].
+    ].
     emp printInfo.
     check := 1.
 ].
 
 operation = 'max' ifTrue: [
+    "ERROR IN THIS FUNCTION. FIX IT."
     emp := Employee new.
     emp := employeeList first.
 
-    employeeList do: [:employee | (emp getSalary) < (employee getSalary) ifTrue: [emp := employee]].
+    employeeList do: [:employee | 
+        gate setValue: (employee getSalary) asNumber.
+        gate compareOps ifTrue: [
+            (emp getSalary) < (employee getSalary) ifTrue: [emp := employee].
+        ].
+    ].
 
     emp printInfo.
     check := 1.
@@ -113,7 +184,12 @@ operation = 'total' ifTrue: [
     | total |
     total := 0.
 
-    employeeList do: [:employee | total := total + (employee getSalary)].
+    employeeList do: [:employee | 
+        gate setValue: (employee getSalary) asNumber.
+        gate compareOps ifTrue: [
+            total := total + (employee getSalary)
+        ].
+    ].
 
     Transcript show: 'Total salary: ', total asString; cr.
     check := 1.
@@ -121,51 +197,34 @@ operation = 'total' ifTrue: [
 
 operation = 'avg' ifTrue: [
     | total averageSalary numEmployees|
-    numEmployees := (employeeList size) asNumber.
-    total := 0.0.
+    total := 0 asNumber.
+    numEmployees := 0 asNumber.
 
-    employeeList do: [:employee | total := total + (employee getSalary asNumber)].
+    employeeList do: [:employee | 
+        gate setValue: (employee getSalary) asNumber.
+        gate compareOps ifTrue: [
+            Transcript show: 'Total: ', total asString; cr.
+            total := total + (employee getSalary asNumber).
+            numEmployees := numEmployees + 1.
+        ].
+    ].
 
-    averageSalary := total / numEmployees.
+    numEmployees <= 0 ifTrue: [
+        Transcript show: 'No employees found'; cr.
+        check := 1.
+    ].
 
-    Transcript show: 'Average salary: ', averageSalary; cr.
-    check := 1.
+    numEmployees > 0 ifTrue: [
+        bool := numEmployees isNumber.
+        Transcript show: bool printString; cr.
+        averageSalary := (total)/(numEmployees).
+
+        Transcript show: 'Average salary: ', averageSalary; cr.
+        check := 1.
+    ].
 ].
-
 
 check = 0 ifTrue: [
     Transcript show: 'Unknown operation: ', operation; cr.
 ].
-
-" check: value and: operation and: threshold [
-    | result |
-
-    result := false.
-
-    operation = 'eq' ifTrue: [
-        result := (value = threshold).
-    ] ifFalse: [
-        operation = 'ne' ifTrue: [
-            result := (value ~= threshold).
-        ] ifFalse: [
-            operation = 'gt' ifTrue: [
-                result := (value > threshold).
-            ] ifFalse: [
-                operation = 'lt' ifTrue: [
-                    result := (value < threshold).
-                ] ifFalse: [
-                    operation = 'ge' ifTrue: [
-                        result := (value >= threshold).
-                    ] ifFalse: [
-                        operation = 'le' ifTrue: [
-                            result := (value <= threshold).
-                        ].
-                    ].
-                ].
-            ].
-        ].
-    ].
-
-    ^ result.
-]. "
 
