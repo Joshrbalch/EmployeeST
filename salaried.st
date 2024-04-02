@@ -7,7 +7,7 @@ Employee subclass: SalariedEmployee [
         salaryAmount := 0. "Initialize the salary amount"
     ]
     
-    salary: aSalary [
+    setSalary: aSalary [
         salaryAmount := aSalary. "Set the salary amount"
     ]
 
@@ -16,6 +16,10 @@ Employee subclass: SalariedEmployee [
         Transcript show: 'weekly salary: ', (self salary asString); cr. "Convert salary to string before output"
         Transcript show: 'earned: $', self salary asString; cr.
         Transcript cr.
+    ]
+
+    getSalary [
+        ^self salary asNumber "Return the salary amount"
     ]
     
     salary [

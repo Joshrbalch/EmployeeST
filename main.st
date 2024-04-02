@@ -1,17 +1,23 @@
-| employeesFile employeeList |
-
-
 "Check for correct number of arguments"
-Smalltalk arguments size >= 5 ifFalse: [
-    Transcript show: 'Usage: gst employee.st salaried.st hourly.st commission.st -f main.st employees.dat count'; cr.
+Smalltalk arguments size >= 2 ifFalse: [
+    Transcript show: 'Usage: gst main.st salaried.st hourly.st commission.st -f employees.dat count'; cr.
     " ^self halt. "
 ].
 
 "Read arguments"
-| employeesFile |
+| employeesFile operation THRESHOLD_PRESENT|
+THRESHOLD_PRESENT := 0.
 employeesFile := (Smalltalk arguments at: 1). "Access the last argument as the file name."
 operation := (Smalltalk arguments at: 2).
-Transcript show: operation; cr.
+Smalltalk arguments size > 2 ifTrue: [
+    mod := (Smalltalk arguments at: 3).
+    threshold := (Smalltalk arguments at: 4).
+    THRESHOLD_PRESENT := 1.
+].
+" Transcript show: operation; cr. "
+
+| employeeList |
+employeeList := OrderedCollection new.
 
 "Open and read employees file"
 | file fileLines |
@@ -28,30 +34,42 @@ file ifNotNil: [
         employeeType := words first.
         firstName := words second.
         lastName := words third.
+        " Transcript show: lastName; cr. "
         otherAttributes := words allButFirst: 3. "Extract remaining attributes"
         
         "Create employee objects based on the type"
-        employeeType switch: 
-            case: ['salaried'] then: [
-                | salary |
-                salary := otherAttributes first asNumber. "Assuming salary is the first attribute after the name"
-                employeeList add: (SalariedEmployee new: firstName lastName salary)
-            ].
-            case: ['hourly'] then: [
-                | hoursRate hoursWorked|
-                hoursRate := otherAttributes first asNumber. "Assuming rate is the first attribute after the name"
-                hoursWorked := otherAttributes second asNumber. "Assuming hours worked is the second attribute after the name"
-                employeeList add: (HourlyEmployee new: firstName lastName hoursWorked hoursRate)
-            ].
-            case: ['commission'] then: [
-                | sales baseCommissionRate basePay|
-                sales := otherAttributes first asNumber.
-                baseCommissionRate := otherAttributes second asNumber.
-                basePay := otherAttributes third asNumber.
-                employeeList add: (CommissionEmployee new: firstName lastName basePay sales baseCommissionRate)
-            ].
-         otherwise: [
-            Transcript show: 'Unknown employee type: ', employeeType; cr.
+        employeeType = 'salaried' ifTrue: [
+            | salary |
+            salary := otherAttributes first asNumber. "Assuming salary is the first attribute after the name"
+            salariedEmp := SalariedEmployee new.
+            salariedEmp setFirstName: firstName.
+            salariedEmp setLastName: lastName.
+            salariedEmp setSalary: salary.
+            employeeList add: salariedEmp.
+        ].
+        employeeType = 'hourly' ifTrue: [
+            | hoursRate hoursWorked|
+            hoursWorked := otherAttributes first asNumber. "Assuming rate is the first attribute after the name"
+            hoursRate := otherAttributes second asNumber. "Assuming hours worked is the second attribute after the name"
+            hourlyEmp := HourlyEmployee new.
+            hourlyEmp setFirstName: firstName.
+            hourlyEmp setLastName: lastName.
+            hourlyEmp setHourlyRate: hoursRate.
+            hourlyEmp setHoursWorked: hoursWorked.
+            employeeList add: hourlyEmp.
+        ].
+        employeeType = 'commission' ifTrue: [
+            | sales baseCommissionRate basePay|
+            basePay := otherAttributes first asNumber.
+            sales := otherAttributes second asNumber.
+            baseCommissionRate := (otherAttributes third asNumber) asFloat.
+            commissionEmp := CommissionEmployee new.
+            commissionEmp setFirstName: firstName.
+            commissionEmp setLastName: lastName.
+            commissionEmp setSales: sales.
+            commissionEmp setBaseCommissionRate: baseCommissionRate.
+            commissionEmp setBasePay: basePay.
+            employeeList add: commissionEmp.
         ].
     ].
 ] ifNil: [
@@ -59,17 +77,95 @@ file ifNotNil: [
     ^self halt.
 ].
 
+check := 0.
 
-" 
-Perform actions based on command-line arguments
-CmdLine args at: 5 = 'count' ifTrue: [ "
-    "Count employees"
-    "Print count"
-" ] ifFalse: [
-    CmdLine args at: 5 = 'print' ifTrue: [ "
-        "Print employees"
-        "Print each employee's details"
-    " ] ifFalse: [ "
-        "Handle other actions"
-    " ].
+"Perform actions based on command-line arguments"
+operation = 'count' ifTrue: [
+    Transcript show: 'Total employees: ', employeeList size asString; cr.
+    check := 1.
+].
+operation = 'print' ifTrue: [
+    employeeList do: [:employee | Transcript show: employee printInfo printString; cr].
+    check := 1.
+].
+
+operation = 'min' ifTrue: [
+    emp := Employee new.
+    emp := employeeList first.
+
+    employeeList do: [:employee | (emp getSalary) > (employee getSalary) ifTrue: [emp := employee]].
+
+    emp printInfo.
+    check := 1.
+].
+
+operation = 'max' ifTrue: [
+    emp := Employee new.
+    emp := employeeList first.
+
+    employeeList do: [:employee | (emp getSalary) < (employee getSalary) ifTrue: [emp := employee]].
+
+    emp printInfo.
+    check := 1.
+].
+
+operation = 'total' ifTrue: [
+    | total |
+    total := 0.
+
+    employeeList do: [:employee | total := total + (employee getSalary)].
+
+    Transcript show: 'Total salary: ', total asString; cr.
+    check := 1.
+].
+
+operation = 'avg' ifTrue: [
+    | total averageSalary numEmployees|
+    numEmployees := (employeeList size) asNumber.
+    total := 0.0.
+
+    employeeList do: [:employee | total := total + (employee getSalary asNumber)].
+
+    averageSalary := total / numEmployees.
+
+    Transcript show: 'Average salary: ', averageSalary; cr.
+    check := 1.
+].
+
+
+check = 0 ifTrue: [
+    Transcript show: 'Unknown operation: ', operation; cr.
+].
+
+" check: value and: operation and: threshold [
+    | result |
+
+    result := false.
+
+    operation = 'eq' ifTrue: [
+        result := (value = threshold).
+    ] ifFalse: [
+        operation = 'ne' ifTrue: [
+            result := (value ~= threshold).
+        ] ifFalse: [
+            operation = 'gt' ifTrue: [
+                result := (value > threshold).
+            ] ifFalse: [
+                operation = 'lt' ifTrue: [
+                    result := (value < threshold).
+                ] ifFalse: [
+                    operation = 'ge' ifTrue: [
+                        result := (value >= threshold).
+                    ] ifFalse: [
+                        operation = 'le' ifTrue: [
+                            result := (value <= threshold).
+                        ].
+                    ].
+                ].
+            ].
+        ].
+    ].
+
+    ^ result.
 ]. "
+

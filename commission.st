@@ -1,34 +1,46 @@
 Employee subclass: CommissionEmployee [
-    | baseSalary salesAmount commissionRate |
+    | baseSalary salesAmount commissionRate calculatedSalary|
     
-    baseSalary: salary sales: sales rate: rate [
-        baseSalary := salary.
+    setBasePay: basePay [
+        baseSalary := basePay.
+    ]
+
+    setSales: sales [
         salesAmount := sales.
-        commissionRate := rate
+    ]
+
+    setBaseCommissionRate: rate [
+        commissionRate := rate.
     ]
 
     printInfo [
         Transcript show: 'Commission employee: ', self fullName; cr.
-        Transcript show: 'minimum salary: ', baseSalary printString, ', sales amount: ', self sales asString, ', commission rate: ', (self rate * 100) asString, '%'; cr.
-        Transcript show: 'earned $', self salaryCalc printString; cr.
+        Transcript show: 'minimum salary: ', self baseSalary asString, ', sales amount: ', self sales asString, ', commission rate: ', (self rate * 100) asString, '%'; cr. "Convert commission rate to percentage string"
+        Transcript show: 'earned $', self salaryCalc asString; cr.
         Transcript cr.
     ]
 
-
     salaryCalc [
         | calculatedSalary |
-        calculatedSalary := baseSalary <= (salesAmount * commissionRate)
-            ifTrue: [ baseSalary ]
-            ifFalse: [ salesAmount * commissionRate ].
-        ^ calculatedSalary
+        calculatedSalary := salesAmount * commissionRate.
+
+        calculatedSalary <= baseSalary ifTrue: [
+            ^ baseSalary asNumber
+        ] ifFalse: [
+            ^ calculatedSalary asNumber
+        ].
+    ]
+
+    getSalary [
+        ^ self salaryCalc
     ]
 
     baseSalary [
-        ^baseSalary
+        ^baseSalary.
     ]
 
     sales [
-        ^salesAmount
+        ^salesAmount.
     ]
 
     rate [
