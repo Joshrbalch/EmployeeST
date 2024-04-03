@@ -165,20 +165,23 @@ operation = 'min' ifTrue: [
 ].
 
 operation = 'max' ifTrue: [
-    "ERROR IN THIS FUNCTION. FIX IT."
-    emp := Employee new.
-    emp := employeeList first.
+    emp := SalariedEmployee new.
+    emp setSalary: 0.
 
     employeeList do: [:employee | 
         gate setValue: (employee getSalary) asNumber.
         gate compareOps ifTrue: [
-            (emp getSalary) < (employee getSalary) ifTrue: [emp := employee].
+            bool := (emp getSalary asNumber) < (employee getSalary asNumber).
+            (emp getSalary asNumber) < (employee getSalary asNumber) ifTrue: [
+                emp := employee.
+            ].
         ].
     ].
 
     emp printInfo.
     check := 1.
 ].
+
 
 operation = 'total' ifTrue: [
     | total |
@@ -203,7 +206,6 @@ operation = 'avg' ifTrue: [
     employeeList do: [:employee | 
         gate setValue: (employee getSalary) asNumber.
         gate compareOps ifTrue: [
-            Transcript show: 'Total: ', total asString; cr.
             total := total + (employee getSalary asNumber).
             numEmployees := numEmployees + 1.
         ].
@@ -215,11 +217,9 @@ operation = 'avg' ifTrue: [
     ].
 
     numEmployees > 0 ifTrue: [
-        bool := numEmployees isNumber.
-        Transcript show: bool printString; cr.
         averageSalary := (total)/(numEmployees).
 
-        Transcript show: 'Average salary: ', averageSalary; cr.
+        Transcript show: 'Average salary: ', averageSalary printString; cr.
         check := 1.
     ].
 ].
