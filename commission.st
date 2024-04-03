@@ -2,15 +2,15 @@ Employee subclass: CommissionEmployee [
     | baseSalary salesAmount commissionRate calculatedSalary|
     
     setBasePay: basePay [
-        baseSalary := basePay.
+        baseSalary := basePay asScaledDecimal: 2.
     ]
 
     setSales: sales [
-        salesAmount := sales.
+        salesAmount := sales asScaledDecimal: 2.
     ]
 
     setBaseCommissionRate: rate [
-        commissionRate := rate.
+        commissionRate := rate asScaledDecimal: 2.
     ]
 
     printInfo [
@@ -25,25 +25,25 @@ Employee subclass: CommissionEmployee [
         calculatedSalary := salesAmount * commissionRate.
 
         calculatedSalary <= baseSalary ifTrue: [
-            ^ baseSalary asNumber
+            ^ baseSalary asScaledDecimal: 2.
         ] ifFalse: [
-            ^ calculatedSalary asNumber
+            ^ calculatedSalary asScaledDecimal: 2.
         ].
     ]
 
     getSalary [
-        ^ self salaryCalc
+        ^ self salaryCalc asScaledDecimal: 2.
     ]
 
     baseSalary [
-        ^baseSalary.
+        ^baseSalary asScaledDecimal: 2.
     ]
 
     sales [
-        ^salesAmount.
+        ^salesAmount asScaledDecimal: 2.
     ]
 
     rate [
-        ^commissionRate
+        ^commissionRate asScaledDecimal: 2.
     ]
 ]

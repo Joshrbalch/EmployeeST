@@ -52,8 +52,13 @@ Object subclass: checkThresh [
 
 "Check for correct number of arguments"
 Smalltalk arguments size >= 2 ifFalse: [
-    Transcript show: 'Usage: gst main.st salaried.st hourly.st commission.st -f employees.dat count'; cr.
-    " ^self halt. "
+    Transcript show: 'Usage: gst employee.st salaried.st hourly.st commission.st -f main.st datafile action'; cr.
+    Transcript show: 'or'; cr.
+    Transcript show: 'Usage: gst employee.st salaried.st hourly.st commission.st -f main.st datafile action operator threshold'; cr.
+    Transcript cr.
+    Transcript show: 'Valid actions: count print min max total avg'; cr.
+    Transcript show: 'Valid operators: eq ne gt ge lt le'; cr.
+    ^self halt.
 ].
 
 "Read arguments"
@@ -125,7 +130,7 @@ file ifNotNil: [
         ].
     ].
 ] ifNil: [
-    Transcript show: 'Error: Unable to open file ', employeesFile.
+    Transcript show: 'Unable to open ', Smalltalk aguments at: 1, 'for reading'; cr.
     ^self halt.
 ].
 
@@ -137,9 +142,20 @@ gate setThreshold: threshold.
 
 "Perform actions based on command-line arguments"
 operation = 'count' ifTrue: [
-    Transcript show: 'Total employees: ', employeeList size asString; cr. 
+    | emps |
+    emps := 0.
+
+    employeeList do: [:employee |
+        gate setValue: (employee getSalary) asNumber.
+        gate compareOps ifTrue: [
+            emps := emps + 1.
+        ].
+    ].
+
+    Transcript show: 'There are ', emps asString, ' employees'; cr. 
     check := 1.
 ].
+
 operation = 'print' ifTrue: [
     employeeList do: [:employee | 
         gate setValue: (employee getSalary) asNumber.
@@ -194,14 +210,14 @@ operation = 'total' ifTrue: [
         ].
     ].
 
-    Transcript show: 'Total salary: ', total asString; cr.
+    Transcript show: 'Total payment is $', total asString; cr.
     check := 1.
 ].
 
 operation = 'avg' ifTrue: [
     | total averageSalary numEmployees|
-    total := 0 asNumber.
-    numEmployees := 0 asNumber.
+    total := 0 asScaledDecimal: 2.
+    numEmployees := 0 asScaledDecimal: 2.
 
     employeeList do: [:employee | 
         gate setValue: (employee getSalary) asNumber.
@@ -219,7 +235,7 @@ operation = 'avg' ifTrue: [
     numEmployees > 0 ifTrue: [
         averageSalary := (total)/(numEmployees).
 
-        Transcript show: 'Average salary: ', averageSalary printString; cr.
+        Transcript show: 'Average payment per employee is $', averageSalary printString; cr.
         check := 1.
     ].
 ].

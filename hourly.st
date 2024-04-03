@@ -2,22 +2,22 @@ Employee subclass: HourlyEmployee [
     | hoursWorked hourlyRate salary calculatedSalary|
     
     setHoursWorked: hours[
-        hoursWorked := hours.
+        hoursWorked := hours asScaledDecimal: 2.
     ]
 
     setHourlyRate: rate[
-        hourlyRate := rate.
+        hourlyRate := rate asScaledDecimal: 2.
     ]
 
     printInfo [
         Transcript show: 'Hourly employee: ', self fullName; cr.
         Transcript show: 'Hours worked: ', (self hours asString), ', hourly rate: ', (self rate asString); cr. "Convert salary to string before output"
-        Transcript show: 'Earned: $', (self salary asString); cr. "Convert salary to string before output"
+        Transcript show: 'earned $', (self salary asString); cr. "Convert salary to string before output"
         Transcript cr.
     ]
 
     getSalary [
-        ^self salary asNumber
+        ^self salary.
     ]
     
     salary [
@@ -34,14 +34,14 @@ Employee subclass: HourlyEmployee [
         hoursWorked > 50 ifTrue: [
             calculatedSalary := (40 * hourlyRate) + (10 * (hourlyRate * 1.5)) + ((hoursWorked - 50) * (hourlyRate * 2)).
         ].
-        ^calculatedSalary.
+        ^calculatedSalary asScaledDecimal: 2.
     ]
 
     hours [
-        ^hoursWorked
+        ^hoursWorked asScaledDecimal: 2.
     ]
 
     rate [
-        ^hourlyRate
+        ^hourlyRate asScaledDecimal: 2.
     ]
 ]

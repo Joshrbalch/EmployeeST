@@ -8,21 +8,21 @@ Employee subclass: SalariedEmployee [
     ]
     
     setSalary: aSalary [
-        salaryAmount := aSalary. "Set the salary amount"
+        salaryAmount := aSalary asScaledDecimal: 2. "Set the salary amount"
     ]
 
     printInfo [
         Transcript show: 'Salaried employee: ', self fullName; cr.
         Transcript show: 'weekly salary: ', (self salary asString); cr. "Convert salary to string before output"
-        Transcript show: 'earned: $', self salary asString; cr.
+        Transcript show: 'earned $', self salary asString; cr.
         Transcript cr.
     ]
 
     getSalary [
-        ^self salary asNumber "Return the salary amount"
+        ^self salary asScaledDecimal: 2 "Return the salary amount"
     ]
     
     salary [
-        ^salaryAmount "Return the salary amount"
+        ^salaryAmount asScaledDecimal: 2 "Return the salary amount"
     ]
 ]
